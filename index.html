@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>뉴스체크</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--red:#e63946;--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--white:#f0f0f0;--gray:#888;--border:#2a2a3a;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px;}
+
+  .page{width:100%;max-width:1100px;display:flex;gap:24px;align-items:flex-start;}
+
+  /* LEFT */
+  .left{flex:1;min-width:0;}
+
+  .header{text-align:center;margin-bottom:28px;}
+  .logo{font-size:1.8rem;font-weight:900;letter-spacing:-1px;}
+  .logo span{color:var(--red);}
+  .tagline{color:var(--gray);font-size:.9rem;margin-top:6px;}
+
+  .input-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;}
+  textarea{width:100%;background:#2c2c3a;border:1px solid #4a4a60;border-radius:12px;padding:16px;color:#f0f0f0;font-family:inherit;font-size:.95rem;resize:none;height:120px;outline:none;transition:.2s;line-height:1.6;}
+  textarea:focus{border-color:var(--red);background:#333344;}
+  textarea::placeholder{color:#9090a8;}
+  .input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:10px;}
+  .char-count{font-size:.8rem;color:var(--gray);}
+  .btn-check{background:var(--red);color:#fff;border:none;padding:11px 28px;border-radius:50px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;}
+  .btn-check:hover{background:#ff4d5a;transform:translateY(-1px);}
+  .btn-check:disabled{background:#444;cursor:not-allowed;transform:none;}
+
+  /* STEPS */
+  .steps-wrap{margin-top:20px;display:none;}
+  .steps-wrap.show{display:block;}
+  .step-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:var(--bg2);border:1px solid var(--border);margin-bottom:8px;transition:.3s;}
+  .step-row.active{border-color:var(--red);background:rgba(230,57,70,.07);}
+  .step-row.done{border-color:#2a4a2a;background:rgba(40,180,80,.05);}
+  .step-icon{font-size:1.2rem;min-width:28px;text-align:center;}
+  .step-info{flex:1;}
+  .step-name{font-size:.88rem;font-weight:700;}
+  .step-desc{font-size:.75rem;color:var(--gray);margin-top:2px;}
+  .step-status{font-size:.78rem;font-weight:700;min-width:56px;text-align:right;}
+  .step-status.waiting{color:#555;}
+  .step-status.running{color:var(--red);}
+  .step-status.done{color:#4caf50;}
+  .spinner{display:inline-block;width:12px;height:12px;border:2px solid #555;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* RESULT */
+  .result-wrap{margin-top:20px;display:none;}
+  .result-wrap.show{display:block;}
+  .result-box{background:var(--bg2);border-radius:20px;padding:28px;border:1px solid var(--border);text-align:center;}
+  .result-verdict{font-size:1.4rem;font-weight:900;margin-bottom:4px;}
+  .verdict-real{color:#4caf50;}
+  .verdict-fake{color:var(--red);}
+  .verdict-unclear{color:#f0a500;}
+  .result-label{font-size:.82rem;color:var(--gray);margin-bottom:20px;}
+  .gauge-wrap{margin:0 auto 20px;max-width:280px;}
+  .gauge-bar{height:8px;background:var(--bg3);border-radius:10px;overflow:hidden;margin-bottom:6px;}
+  .gauge-fill{height:100%;border-radius:10px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+  .gauge-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray);}
+  .gauge-score{font-size:2.6rem;font-weight:900;line-height:1;}
+  .gauge-unit{font-size:.95rem;color:var(--gray);}
+  .breakdown{margin-top:20px;text-align:left;}
+  .bd-title{font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--gray);text-transform:uppercase;margin-bottom:10px;}
+  .bd-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .bd-label{font-size:.82rem;min-width:100px;color:#aaa;}
+  .bd-bar{flex:1;height:5px;background:var(--bg3);border-radius:6px;overflow:hidden;}
+  .bd-fill{height:100%;border-radius:6px;transition:width 1.4s ease;}
+  .bd-val{font-size:.8rem;font-weight:700;min-width:34px;text-align:right;}
+  .summary-box{margin-top:16px;background:var(--bg3);border-radius:12px;padding:14px 18px;text-align:left;font-size:.86rem;color:#bbb;line-height:1.7;border-left:3px solid var(--red);}
+  .btn-reset{margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--gray);padding:9px 24px;border-radius:50px;cursor:pointer;font-family:inherit;font-size:.82rem;transition:.2s;}
+  .btn-reset:hover{border-color:#fff;color:#fff;}
+
+  /* RIGHT — HISTORY */
+  .right{width:280px;flex-shrink:0;position:sticky;top:24px;}
+  .history-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+  .history-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .history-title{font-size:.95rem;font-weight:700;}
+  .history-count{font-size:.75rem;color:var(--gray);background:var(--bg3);padding:2px 10px;border-radius:50px;}
+  .history-empty{padding:40px 20px;text-align:center;color:#555;font-size:.85rem;line-height:1.7;}
+  .history-list{max-height:calc(100vh - 160px);overflow-y:auto;}
+  .history-list::-webkit-scrollbar{width:4px;}
+  .history-list::-webkit-scrollbar-track{background:transparent;}
+  .history-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .hist-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:.2s;position:relative;}
+  .hist-item:last-child{border-bottom:none;}
+  .hist-item:hover{background:rgba(255,255,255,.04);}
+  .hist-item:hover .hist-del{opacity:1;}
+  .hist-item.active{background:rgba(230,57,70,.07);border-left:3px solid var(--red);}
+  .hist-text{font-size:.82rem;color:var(--white);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .hist-meta{display:flex;align-items:center;justify-content:space-between;}
+  .hist-del{opacity:0;background:none;border:none;color:#555;cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:4px;transition:.15s;line-height:1;flex-shrink:0;}
+  .hist-del:hover{color:var(--red);background:rgba(230,57,70,.12);}
+  .hist-score{font-size:.78rem;font-weight:700;}
+  .hist-badge{font-size:.7rem;padding:2px 8px;border-radius:50px;font-weight:700;}
+  .badge-real{background:rgba(76,175,80,.15);color:#4caf50;}
+  .badge-fake{background:rgba(230,57,70,.15);color:var(--red);}
+  .badge-unclear{background:rgba(240,165,0,.15);color:#f0a500;}
+  .hist-time{font-size:.7rem;color:#555;}
+
+  /* MODAL for history detail */
+  .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:24px;}
+  .modal-backdrop.show{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal-close{position:absolute;top:16px;right:16px;background:var(--bg3);border:none;color:var(--gray);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .modal-close:hover{color:var(--white);}
+  .modal-input-text{font-size:.85rem;color:#aaa;background:var(--bg3);border-radius:10px;padding:12px 14px;line-height:1.6;margin-bottom:20px;}
+
+  @media(max-width:720px){
+    .page{flex-direction:column;}
+    .right{width:100%;position:static;}
+    .history-list{max-height:240px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="header">
+      <div class="logo">뉴스<span>체크</span></div>
+      <div class="tagline">뉴스나 정보를 입력하면 AI가 신뢰도를 분석해 드립니다</div>
+    </div>
+
+    <div class="input-box">
+      <textarea id="newsInput" placeholder="판별할 뉴스 제목, 내용, 또는 URL을 입력하세요...&#10;예) '초콜릿을 매일 먹으면 다이어트에 효과적이라는 연구 결과가 나왔다'"></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="charCount">0자</span>
+        <button class="btn-check" id="checkBtn" onclick="startCheck()">판별 시작</button>
+      </div>
+    </div>
+
+    <div class="steps-wrap" id="stepsWrap">
+      <div class="step-row" id="s0"><div class="step-icon">🔎</div><div class="step-info"><div class="step-name">텍스트 전처리</div><div class="step-desc">핵심 키워드 및 주제 추출</div></div><div class="step-status waiting" id="ss0">대기</div></div>
+      <div class="step-row" id="s1"><div class="step-icon">🌐</div><div class="step-info"><div class="step-name">출처 신뢰도 검증</div><div class="step-desc">언론사·도메인 신뢰 데이터베이스 대조</div></div><div class="step-status waiting" id="ss1">대기</div></div>
+      <div class="step-row" id="s2"><div class="step-icon">📋</div><div class="step-info"><div class="step-name">팩트체크 DB 대조</div><div class="step-desc">공인 팩트체크 기관 데이터와 비교</div></div><div class="step-status waiting" id="ss2">대기</div></div>
+      <div class="step-row" id="s3"><div class="step-icon">🧠</div><div class="step-info"><div class="step-name">언어 편향성 분석</div><div class="step-desc">선동적·감정적 표현 패턴 감지</div></div><div class="step-status waiting" id="ss3">대기</div></div>
+      <div class="step-row" id="s4"><div class="step-icon">⚖️</div><div class="step-info"><div class="step-name">종합 신뢰도 산출</div><div class="step-desc">모든 분석 결과를 통합하여 최종 점수 계산</div></div><div class="step-status waiting" id="ss4">대기</div></div>
+    </div>
+
+    <div class="result-wrap" id="resultWrap">
+      <div class="result-box">
+        <div class="result-verdict" id="resultVerdict"></div>
+        <div class="result-label" id="resultLabel"></div>
+        <div class="gauge-wrap">
+          <div class="gauge-score"><span id="scoreNum">0</span><span class="gauge-unit">%</span></div>
+          <div style="font-size:.75rem;color:var(--gray);margin:4px 0 8px;">신뢰도 점수</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+          <div class="gauge-labels"><span>가짜</span><span>불확실</span><span>신뢰</span></div>
+        </div>
+        <div class="breakdown">
+          <div class="bd-title">항목별 분석</div>
+          <div class="bd-row"><div class="bd-label">출처 신뢰도</div><div class="bd-bar"><div class="bd-fill" id="bd0" style="width:0%"></div></div><div class="bd-val" id="bv0">-</div></div>
+          <div class="bd-row"><div class="bd-label">팩트체크</div><div class="bd-bar"><div class="bd-fill" id="bd1" style="width:0%"></div></div><div class="bd-val" id="bv1">-</div></div>
+          <div class="bd-row"><div class="bd-label">언어 편향성</div><div class="bd-bar"><div class="bd-fill" id="bd2" style="width:0%"></div></div><div class="bd-val" id="bv2">-</div></div>
+          <div class="bd-row"><div class="bd-label">논리 일관성</div><div class="bd-bar"><div class="bd-fill" id="bd3" style="width:0%"></div></div><div class="bd-val" id="bv3">-</div></div>
+        </div>
+        <div class="summary-box" id="summaryBox"></div>
+        <button class="btn-reset" onclick="reset()">다시 판별하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: HISTORY -->
+  <div class="right">
+    <div class="history-box">
+      <div class="history-header">
+        <span class="history-title">판별 이력</span>
+        <span class="history-count" id="histCount">0건</span>
+      </div>
+      <div id="historyEmpty" class="history-empty">아직 판별한 뉴스가 없어요.<br>왼쪽에서 판별을 시작해보세요!</div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-input-text" id="modalText"></div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="result-verdict" id="modalVerdict"></div>
+      <div class="result-label" id="modalLabel"></div>
+      <div class="gauge-wrap" style="margin-top:12px;">
+        <div class="gauge-score"><span id="modalScore"></span><span class="gauge-unit">%</span></div>
+        <div style="font-size:.75rem;color:var(--gray);margin:4px 0 8px;">신뢰도 점수</div>
+        <div class="gauge-bar"><div class="gauge-fill" id="modalGauge" style="width:0%;transition:none"></div></div>
+        <div class="gauge-labels"><span>가짜</span><span>불확실</span><span>신뢰</span></div>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">항목별 분석</div>
+      <div class="bd-row"><div class="bd-label">출처 신뢰도</div><div class="bd-bar"><div class="bd-fill" id="mbd0" style="width:0%;transition:none"></div></div><div class="bd-val" id="mbv0">-</div></div>
+      <div class="bd-row"><div class="bd-label">팩트체크</div><div class="bd-bar"><div class="bd-fill" id="mbd1" style="width:0%;transition:none"></div></div><div class="bd-val" id="mbv1">-</div></div>
+      <div class="bd-row"><div class="bd-label">언어 편향성</div><div class="bd-bar"><div class="bd-fill" id="mbd2" style="width:0%;transition:none"></div></div><div class="bd-val" id="mbv2">-</div></div>
+      <div class="bd-row"><div class="bd-label">논리 일관성</div><div class="bd-bar"><div class="bd-fill" id="mbd3" style="width:0%;transition:none"></div></div><div class="bd-val" id="mbv3">-</div></div>
+    </div>
+    <div class="summary-box" id="modalSummary" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<script>
+const textarea = document.getElementById('newsInput');
+let history = [];
+let currentResult = null;
+
+textarea.addEventListener('input', () => {
+  document.getElementById('charCount').textContent = textarea.value.length + '자';
+});
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function startCheck(){
+  const text = textarea.value.trim();
+  if(!text){ textarea.focus(); return; }
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('stepsWrap').classList.add('show');
+  document.getElementById('resultWrap').classList.remove('show');
+  for(let i=0;i<5;i++){
+    document.getElementById('s'+i).className='step-row';
+    const ss=document.getElementById('ss'+i);
+    ss.className='step-status waiting'; ss.innerHTML='대기';
+  }
+  const durations=[900,1100,1000,950,800];
+  for(let i=0;i<5;i++){
+    const row=document.getElementById('s'+i);
+    const ss=document.getElementById('ss'+i);
+    row.classList.add('active');
+    ss.className='step-status running';
+    ss.innerHTML='<span class="spinner"></span>분석중';
+    await sleep(durations[i]);
+    row.classList.remove('active');
+    row.classList.add('done');
+    ss.className='step-status done';
+    ss.innerHTML='✓ 완료';
+  }
+  await sleep(300);
+  showResult(text);
+}
+
+async function showResult(text){
+  const prompt = `다음 뉴스 또는 정보의 신뢰도를 분석해주세요.\n\n입력: "${text}"\n\n반드시 아래 JSON 형식만 출력하세요.\n{\n  "score": (0~100 정수),\n  "source": (0~100),\n  "fact": (0~100),\n  "bias": (0~100, 높을수록 편향 없음),\n  "logic": (0~100),\n  "verdict": "real" | "fake" | "unclear",\n  "summary": "2~3문장 판별 근거 (한국어)"\n}`;
+
+  let data = { score:50, source:50, fact:50, bias:50, logic:50, verdict:'unclear', summary:'분석 결과를 가져오지 못했습니다.' };
+  try {
+    const res = await fetch("/api/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
+    data = await res.json();
+  } catch(e){ console.error(e); }
+
+  currentResult = { text, data, time: new Date() };
+  renderResult(data);
+  addToHistory(currentResult);
+  document.getElementById('checkBtn').disabled = false;
+}
+
+function renderResult(data){
+  const vEl=document.getElementById('resultVerdict');
+  const lEl=document.getElementById('resultLabel');
+  if(data.verdict==='real'){vEl.textContent='✅ 신뢰할 수 있는 정보';vEl.className='result-verdict verdict-real';lEl.textContent='이 내용은 신뢰도가 높은 것으로 판단됩니다.';}
+  else if(data.verdict==='fake'){vEl.textContent='🚨 가짜뉴스 가능성 높음';vEl.className='result-verdict verdict-fake';lEl.textContent='이 내용은 허위 또는 과장된 정보일 가능성이 높습니다.';}
+  else{vEl.textContent='⚠️ 판별 불확실';vEl.className='result-verdict verdict-unclear';lEl.textContent='정보가 부족하거나 일부만 사실일 수 있습니다.';}
+
+  const s=data.score;
+  const gColor=s>=70?'#4caf50':s>=40?'#f0a500':'#e63946';
+  const fill=document.getElementById('gaugeFill');
+  fill.style.background=gColor;
+  document.getElementById('resultWrap').classList.add('show');
+
+  let cur=0;
+  const timer=setInterval(()=>{
+    cur=Math.min(cur+Math.ceil(s/40),s);
+    document.getElementById('scoreNum').textContent=cur;
+    fill.style.width=cur+'%';
+    if(cur>=s) clearInterval(timer);
+  },25);
+
+  const bColors=['#4a9eff','#a78bfa','#f0a500','#4caf50'];
+  [data.source,data.fact,data.bias,data.logic].forEach((v,i)=>{
+    setTimeout(()=>{
+      document.getElementById('bd'+i).style.cssText=`width:${v}%;background:${bColors[i]}`;
+      document.getElementById('bv'+i).textContent=v+'%';
+    },300+i*120);
+  });
+  document.getElementById('summaryBox').textContent=data.summary;
+}
+
+function addToHistory(item){
+  history.unshift(item);
+  document.getElementById('historyEmpty').style.display='none';
+  document.getElementById('histCount').textContent=history.length+'건';
+  const list=document.getElementById('historyList');
+
+  const verdictMap={real:{badge:'badge-real',label:'신뢰',score_color:'#4caf50'},fake:{badge:'badge-fake',label:'가짜',score_color:'#e63946'},unclear:{badge:'badge-unclear',label:'불확실',score_color:'#f0a500'}};
+  const v=verdictMap[item.data.verdict]||verdictMap.unclear;
+  const timeStr=item.time.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  const shortText=item.text.length>60?item.text.slice(0,60)+'…':item.text;
+
+  const div=document.createElement('div');
+  div.className='hist-item';
+  div.innerHTML=`
+    <div class="hist-text">${shortText}</div>
+    <div class="hist-meta">
+      <span class="hist-score" style="color:${v.score_color}">${item.data.score}%</span>
+      <span class="hist-badge ${v.badge}">${v.label}</span>
+      <span class="hist-time">${timeStr}</span>
+      <button class="hist-del" title="삭제" onclick="deleteHist(event, this)">✕</button>
+    </div>`;
+  list.insertBefore(div, list.firstChild);
+
+  // 모든 항목에 현재 history 인덱스를 직접 저장
+  list.querySelectorAll('.hist-item').forEach((el, i) => {
+    el.onclick = () => openModal(i);
+  });
+}
+
+function deleteHist(e, btn){
+  e.stopPropagation();
+  const list = document.getElementById('historyList');
+  const item = btn.closest('.hist-item');
+  const idx = Array.from(list.children).indexOf(item);
+  history.splice(idx, 1);
+  item.remove();
+  document.getElementById('histCount').textContent = history.length + '건';
+  if(history.length === 0) document.getElementById('historyEmpty').style.display='';
+  // 클릭 이벤트 재연결
+  list.querySelectorAll('.hist-item').forEach((el, i) => { el.onclick = () => openModal(i); });
+}
+
+function openModal(idx){
+  const item=history[idx];
+  if(!item) return;
+  const data=item.data;
+  document.getElementById('modalText').textContent=item.text;
+
+  const vEl=document.getElementById('modalVerdict');
+  const lEl=document.getElementById('modalLabel');
+  if(data.verdict==='real'){vEl.textContent='✅ 신뢰할 수 있는 정보';vEl.className='result-verdict verdict-real';lEl.textContent='신뢰도가 높은 정보입니다.';}
+  else if(data.verdict==='fake'){vEl.textContent='🚨 가짜뉴스 가능성 높음';vEl.className='result-verdict verdict-fake';lEl.textContent='허위 또는 과장된 정보일 가능성이 높습니다.';}
+  else{vEl.textContent='⚠️ 판별 불확실';vEl.className='result-verdict verdict-unclear';lEl.textContent='추가 확인을 권장합니다.';}
+
+  const s=data.score;
+  const gColor=s>=70?'#4caf50':s>=40?'#f0a500':'#e63946';
+  document.getElementById('modalScore').textContent=s;
+  const mg=document.getElementById('modalGauge');
+  mg.style.background=gColor; mg.style.width=s+'%';
+
+  const bColors=['#4a9eff','#a78bfa','#f0a500','#4caf50'];
+  [data.source,data.fact,data.bias,data.logic].forEach((v,i)=>{
+    document.getElementById('mbd'+i).style.cssText=`width:${v}%;background:${bColors[i]}`;
+    document.getElementById('mbv'+i).textContent=v+'%';
+  });
+  document.getElementById('modalSummary').textContent=data.summary;
+
+  // highlight active
+  document.querySelectorAll('.hist-item').forEach(el=>el.classList.remove('active'));
+  const list=document.getElementById('historyList');
+  if(list.children[idx]) list.children[idx].classList.add('active');
+
+  document.getElementById('modalBackdrop').classList.add('show');
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modalBackdrop')) closeModalDirect();
+}
+function closeModalDirect(){
+  document.getElementById('modalBackdrop').classList.remove('show');
+  document.querySelectorAll('.hist-item').forEach(el=>el.classList.remove('active'));
+}
+
+function reset(){
+  textarea.value='';
+  document.getElementById('charCount').textContent='0자';
+  document.getElementById('stepsWrap').classList.remove('show');
+  document.getElementById('resultWrap').classList.remove('show');
+  document.getElementById('checkBtn').disabled=false;
+  textarea.focus();
+}
+</script>
+</body>
+</html>
