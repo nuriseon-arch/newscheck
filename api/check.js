@@ -6,16 +6,17 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   let text = '';
+  let today = '';
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     text = body?.text || '';
+    today = body?.today || `${new Date().getFullYear()}년 ${new Date().getMonth()+1}월 ${new Date().getDate()}일`;
   } catch(e) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
-  const prompt = `오늘 날짜는 ${today}입니다. 현재 연도 기준으로 판단하세요.
+  const prompt = `오늘은 ${today}입니다. 반드시 이 날짜를 현재 시점으로 판단하세요. 2026년이 현재입니다.
 
 다음 뉴스 또는 정보의 신뢰도를 분석해주세요.
 입력: "${text}"
