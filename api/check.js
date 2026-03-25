@@ -16,23 +16,33 @@ export default async function handler(req, res) {
   }
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const prompt = `오늘은 ${today}입니다. 현재 연도는 2026년입니다.
+  const prompt = `오늘은 ${today}이고 현재 연도는 2026년입니다.
 
-[현재 확인된 사실 - 반드시 참고하세요]
+[현재 확인된 사실]
 - 대한민국 대통령: 이재명 (2025년 취임)
-- 전 대통령 윤석열은 2025년 탄핵으로 파면됨
+- 전 대통령 윤석열은 2025년 탄핵 파면됨
 - 현재 집권당: 더불어민주당
 
-[중요 지침]
-- 학습 데이터는 2025년 8월까지입니다. 그 이후 사건은 위 사실을 우선 참고하세요.
-- 위 사실과 일치하는 내용은 real로 판정하세요.
-- 확인 불가 최근 사건은 "unclear", 명백한 허위만 "fake", 출처 명확·논리적이면 "real"
+[판별 기준]
+- 위 사실과 일치하면 real
+- 확인 불가 최근 사건은 unclear
+- 명백한 허위만 fake
 
-다음을 분석하세요: "${text.replace(/"/g, "'")}"
+분석 대상: ${text.replace(/[\r\n]+/g, ' ')}
 
-아래 JSON을 그대로 복사해서 숫자와 텍스트만 채워 출력하세요.
-줄바꿈 없이 한 줄로, 따옴표 안에 따옴표 사용 금지, 특수문자 금지:
-{"score":0,"source":0,"fact":0,"bias":0,"logic":0,"verdict":"unclear","summary":"여기에 2문장 요약","details":{"source_analysis":"출처 분석 내용","fact_analysis":"팩트체크 내용","bias_analysis":"편향성 분석 내용","logic_analysis":"논리 분석 내용","conclusion":"최종 판단 근거"}}`;
+아래 형식으로 정확히 출력하세요. 각 줄을 그대로 유지하고 콜론 뒤 값만 바꾸세요:
+SCORE:75
+SOURCE:80
+FACT:70
+BIAS:85
+LOGIC:75
+VERDICT:real
+SUMMARY:여기에 판별 요약을 두 문장으로 작성
+SOURCE_ANALYSIS:출처 신뢰도 분석 내용
+FACT_ANALYSIS:팩트체크 내용
+BIAS_ANALYSIS:편향성 분석 내용
+LOGIC_ANALYSIS:논리 일관성 분석 내용
+CONCLUSION:최종 판단 근거 내용`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -56,24 +66,32 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: data.error?.message || 'API error' });
     }
 
-    const raw = data.content[0].text
-      .replace(/```json|```/g, '')
-      .replace(/[\u0000-\u001F\u007F]/g, ' ')  // 제어문자 제거
-      .trim();
+    const raw = data.content[0].text.trim();
+    console.log('Raw response:', raw.slice(0, 300));
 
-    let result;
-    try {
-      result = JSON.parse(raw);
-    } catch(parseErr) {
-      // JSON 파싱 실패 시 간단한 응답 반환
-      console.error('JSON parse error:', parseErr.message, 'Raw:', raw.slice(0, 200));
-      result = {
-        score: 50, source: 50, fact: 50, bias: 50, logic: 50,
-        verdict: 'unclear',
-        summary: 'AI 응답 파싱에 실패했습니다. 다시 시도해주세요.',
-        details: null
-      };
-    }
+    // 줄 단위 파싱
+    const lines = raw.split('\n');
+    const get = (key) => {
+      const line = lines.find(l => l.startsWith(key + ':'));
+      return line ? line.slice(key.length + 1).trim() : '';
+    };
+
+    const result = {
+      score:   parseInt(get('SCORE'))  || 50,
+      source:  parseInt(get('SOURCE')) || 50,
+      fact:    parseInt(get('FACT'))   || 50,
+      bias:    parseInt(get('BIAS'))   || 50,
+      logic:   parseInt(get('LOGIC'))  || 50,
+      verdict: get('VERDICT') || 'unclear',
+      summary: get('SUMMARY') || '분석 결과를 가져오지 못했습니다.',
+      details: {
+        source_analysis: get('SOURCE_ANALYSIS'),
+        fact_analysis:   get('FACT_ANALYSIS'),
+        bias_analysis:   get('BIAS_ANALYSIS'),
+        logic_analysis:  get('LOGIC_ANALYSIS'),
+        conclusion:      get('CONCLUSION')
+      }
+    };
     return res.status(200).json(result);
   } catch(e) {
     console.error('Handler error:', e.message);
