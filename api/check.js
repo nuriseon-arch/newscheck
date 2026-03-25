@@ -16,12 +16,21 @@ export default async function handler(req, res) {
   }
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const prompt = `오늘은 ${today}입니다. 반드시 이 날짜를 현재 시점으로 판단하세요. 2026년이 현재입니다.
+  const prompt = `오늘은 ${today}입니다. 현재 연도는 2026년입니다.
+
+중요: 당신의 학습 데이터는 2025년 8월까지입니다. 그 이후 발생한 사건(예: 선거 결과, 새 대통령, 정권 교체 등)은 당신이 모를 수 있습니다. 이런 경우 "알 수 없음"이 아니라 "불확실"로 판정하고, 학습 데이터 이후 사건일 수 있다고 summary에 언급하세요.
+
+판별 기준:
+- 사실 여부를 확인할 수 없는 최근 사건은 "unclear"로 판정
+- 명백한 허위 정보나 날조된 내용만 "fake"로 판정
+- 출처가 명확하고 논리적으로 타당하면 "real"로 판정
+- 판별에 확신이 없으면 반드시 "unclear"로 판정
 
 다음 뉴스 또는 정보의 신뢰도를 분석해주세요.
 입력: "${text}"
+
 순수 JSON만 출력하세요. 마크다운, 설명 없이:
-{"score":숫자,"source":숫자,"fact":숫자,"bias":숫자,"logic":숫자,"verdict":"real또는fake또는unclear","summary":"한국어2~3문장"}`;
+{"score":숫자,"source":숫자,"fact":숫자,"bias":숫자,"logic":숫자,"verdict":"real또는fake또는unclear","summary":"한국어2~3문장. 학습데이터 이후 사건이면 그 점을 언급"}`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
