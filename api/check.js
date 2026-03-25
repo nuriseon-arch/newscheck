@@ -18,33 +18,14 @@ export default async function handler(req, res) {
 
   const prompt = `오늘은 ${today}입니다. 현재 연도는 2026년입니다.
 
-중요: 당신의 학습 데이터는 2025년 8월까지입니다. 그 이후 발생한 사건은 모를 수 있으므로 확신이 없으면 "unclear"로 판정하세요.
+중요: 학습 데이터는 2025년 8월까지입니다. 그 이후 사건은 "unclear"로 판정하세요.
+판별 기준: 확인 불가 최근 사건→unclear, 명백한 허위→fake, 출처 명확·논리적→real
 
-판별 기준:
-- 사실 여부를 확인할 수 없는 최근 사건은 "unclear"
-- 명백한 허위·날조된 내용만 "fake"
-- 출처가 명확하고 논리적으로 타당하면 "real"
+다음을 분석하세요: "${text.replace(/"/g, "'")}"
 
-다음 뉴스 또는 정보를 분석해주세요.
-입력: "${text}"
-
-순수 JSON만 출력하세요. 마크다운 없이:
-{
-  "score": 숫자,
-  "source": 숫자,
-  "fact": 숫자,
-  "bias": 숫자,
-  "logic": 숫자,
-  "verdict": "real또는fake또는unclear",
-  "summary": "2~3문장 종합 판단 요약",
-  "details": {
-    "source_analysis": "출처 신뢰도 분석: 관련 언론사·기관·출처를 구체적으로 언급하며 설명",
-    "fact_analysis": "팩트체크: 핵심 주장의 사실 여부를 구체적 근거와 함께 설명. 관련 공식 자료·통계·발표 등 인용",
-    "bias_analysis": "언어 편향성: 감정적·선동적 표현이 있는지 구체적 문구를 지적하며 설명",
-    "logic_analysis": "논리 일관성: 주장의 인과관계·근거가 타당한지 설명",
-    "conclusion": "최종 판단 근거: 위 분석을 종합해 판별 결과를 도출한 이유를 3~5문장으로 상세히 설명"
-  }
-}`;
+아래 JSON을 그대로 복사해서 숫자와 텍스트만 채워 출력하세요.
+줄바꿈 없이 한 줄로, 따옴표 안에 따옴표 사용 금지, 특수문자 금지:
+{"score":0,"source":0,"fact":0,"bias":0,"logic":0,"verdict":"unclear","summary":"여기에 2문장 요약","details":{"source_analysis":"출처 분석 내용","fact_analysis":"팩트체크 내용","bias_analysis":"편향성 분석 내용","logic_analysis":"논리 분석 내용","conclusion":"최종 판단 근거"}}`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -68,8 +49,24 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: data.error?.message || 'API error' });
     }
 
-    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(raw);
+    const raw = data.content[0].text
+      .replace(/```json|```/g, '')
+      .replace(/[\u0000-\u001F\u007F]/g, ' ')  // 제어문자 제거
+      .trim();
+
+    let result;
+    try {
+      result = JSON.parse(raw);
+    } catch(parseErr) {
+      // JSON 파싱 실패 시 간단한 응답 반환
+      console.error('JSON parse error:', parseErr.message, 'Raw:', raw.slice(0, 200));
+      result = {
+        score: 50, source: 50, fact: 50, bias: 50, logic: 50,
+        verdict: 'unclear',
+        summary: 'AI 응답 파싱에 실패했습니다. 다시 시도해주세요.',
+        details: null
+      };
+    }
     return res.status(200).json(result);
   } catch(e) {
     console.error('Handler error:', e.message);
