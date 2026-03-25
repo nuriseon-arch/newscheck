@@ -245,10 +245,12 @@ async function showResult(text){
 
   let data = { score:50, source:50, fact:50, bias:50, logic:50, verdict:'unclear', summary:'분석 결과를 가져오지 못했습니다.' };
   try {
+    const now = new Date();
+    const today = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
     const res = await fetch("/api/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text, today })
     });
     data = await res.json();
   } catch(e){ console.error(e); }
