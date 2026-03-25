@@ -14,11 +14,19 @@
   /* LEFT */
   .left{flex:1;min-width:0;}
 
-  .header{text-align:center;margin-bottom:28px;}
+  .header{text-align:center;margin-bottom:20px;}
   .logo{font-size:1.8rem;font-weight:900;letter-spacing:-1px;}
   .logo span{color:var(--red);}
   .tagline{color:var(--gray);font-size:.9rem;margin-top:6px;}
 
+  /* HOW TO */
+  .howto{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .howto-card{flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+  .howto-icon{font-size:1.3rem;margin-top:2px;}
+  .howto-title{font-size:.82rem;font-weight:700;margin-bottom:3px;}
+  .howto-desc{font-size:.77rem;color:var(--gray);line-height:1.5;}
+
+  /* INPUT */
   .input-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;}
   textarea{width:100%;background:#2c2c3a;border:1px solid #4a4a60;border-radius:12px;padding:16px;color:#f0f0f0;font-family:inherit;font-size:.95rem;resize:none;height:120px;outline:none;transition:.2s;line-height:1.6;}
   textarea:focus{border-color:var(--red);background:#333344;}
@@ -76,7 +84,7 @@
   .btn-reset{margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--gray);padding:9px 24px;border-radius:50px;cursor:pointer;font-family:inherit;font-size:.82rem;transition:.2s;}
   .btn-reset:hover{border-color:#fff;color:#fff;}
 
-  /* RIGHT — HISTORY */
+  /* RIGHT */
   .right{width:280px;flex-shrink:0;position:sticky;top:24px;}
   .history-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
   .history-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
@@ -85,7 +93,6 @@
   .history-empty{padding:40px 20px;text-align:center;color:#555;font-size:.85rem;line-height:1.7;}
   .history-list{max-height:calc(100vh - 160px);overflow-y:auto;}
   .history-list::-webkit-scrollbar{width:4px;}
-  .history-list::-webkit-scrollbar-track{background:transparent;}
   .history-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
   .hist-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:.2s;position:relative;}
   .hist-item:last-child{border-bottom:none;}
@@ -94,19 +101,19 @@
   .hist-item.active{background:rgba(230,57,70,.07);border-left:3px solid var(--red);}
   .hist-text{font-size:.82rem;color:var(--white);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .hist-meta{display:flex;align-items:center;justify-content:space-between;}
-  .hist-del{opacity:0;background:none;border:none;color:#555;cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:4px;transition:.15s;line-height:1;flex-shrink:0;}
-  .hist-del:hover{color:var(--red);background:rgba(230,57,70,.12);}
   .hist-score{font-size:.78rem;font-weight:700;}
   .hist-badge{font-size:.7rem;padding:2px 8px;border-radius:50px;font-weight:700;}
   .badge-real{background:rgba(76,175,80,.15);color:#4caf50;}
   .badge-fake{background:rgba(230,57,70,.15);color:var(--red);}
   .badge-unclear{background:rgba(240,165,0,.15);color:#f0a500;}
   .hist-time{font-size:.7rem;color:#555;}
+  .hist-del{opacity:0;background:none;border:none;color:#555;cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:4px;transition:.15s;line-height:1;flex-shrink:0;}
+  .hist-del:hover{color:var(--red);background:rgba(230,57,70,.12);}
 
-  /* MODAL for history detail */
+  /* MODAL */
   .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:24px;}
   .modal-backdrop.show{display:flex;}
-  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;}
   .modal-close{position:absolute;top:16px;right:16px;background:var(--bg3);border:none;color:var(--gray);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:.2s;}
   .modal-close:hover{color:var(--white);}
   .modal-input-text{font-size:.85rem;color:#aaa;background:var(--bg3);border-radius:10px;padding:12px 14px;line-height:1.6;margin-bottom:20px;}
@@ -120,34 +127,24 @@
 </head>
 <body>
 <div class="page">
-  <!-- LEFT -->
   <div class="left">
     <div class="header">
       <div class="logo">뉴스<span>체크</span></div>
       <div class="tagline">뉴스나 정보를 입력하면 AI가 신뢰도를 분석해 드립니다</div>
     </div>
 
-    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
-        <div style="font-size:1.3rem;margin-top:2px;">✍️</div>
-        <div>
-          <div style="font-size:.82rem;font-weight:700;margin-bottom:3px;">1. 입력</div>
-          <div style="font-size:.77rem;color:var(--gray);line-height:1.5;">의심되는 뉴스나 정보를 아래 입력창에 붙여넣으세요</div>
-        </div>
+    <div class="howto">
+      <div class="howto-card">
+        <div class="howto-icon">✍️</div>
+        <div><div class="howto-title">1. 입력</div><div class="howto-desc">의심되는 뉴스나 정보를 아래 입력창에 붙여넣으세요</div></div>
       </div>
-      <div style="flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
-        <div style="font-size:1.3rem;margin-top:2px;">🤖</div>
-        <div>
-          <div style="font-size:.82rem;font-weight:700;margin-bottom:3px;">2. 분석</div>
-          <div style="font-size:.77rem;color:var(--gray);line-height:1.5;">AI가 출처·팩트·편향성 등 5단계로 자동 분석합니다</div>
-        </div>
+      <div class="howto-card">
+        <div class="howto-icon">🤖</div>
+        <div><div class="howto-title">2. 분석</div><div class="howto-desc">AI가 출처·팩트·편향성 등 5단계로 자동 분석합니다</div></div>
       </div>
-      <div style="flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
-        <div style="font-size:1.3rem;margin-top:2px;">📊</div>
-        <div>
-          <div style="font-size:.82rem;font-weight:700;margin-bottom:3px;">3. 결과 확인</div>
-          <div style="font-size:.77rem;color:var(--gray);line-height:1.5;">신뢰도 점수와 판별 근거를 확인하고 현명하게 판단하세요</div>
-        </div>
+      <div class="howto-card">
+        <div class="howto-icon">📊</div>
+        <div><div class="howto-title">3. 결과 확인</div><div class="howto-desc">신뢰도 점수와 판별 근거를 확인하고 현명하게 판단하세요</div></div>
       </div>
     </div>
 
@@ -191,7 +188,6 @@
     </div>
   </div>
 
-  <!-- RIGHT: HISTORY -->
   <div class="right">
     <div class="history-box">
       <div class="history-header">
@@ -227,13 +223,13 @@
       <div class="bd-row"><div class="bd-label">논리 일관성</div><div class="bd-bar"><div class="bd-fill" id="mbd3" style="width:0%;transition:none"></div></div><div class="bd-val" id="mbv3">-</div></div>
     </div>
     <div class="summary-box" id="modalSummary" style="margin-top:16px;"></div>
+    <div class="detail-wrap" id="modalDetailWrap" style="margin-top:8px;"></div>
   </div>
 </div>
 
 <script>
 const textarea = document.getElementById('newsInput');
 let history = [];
-let currentResult = null;
 
 textarea.addEventListener('input', () => {
   document.getElementById('charCount').textContent = textarea.value.length + '자';
@@ -270,12 +266,10 @@ async function startCheck(){
 }
 
 async function showResult(text){
-  const prompt = `다음 뉴스 또는 정보의 신뢰도를 분석해주세요.\n\n입력: "${text}"\n\n반드시 아래 JSON 형식만 출력하세요.\n{\n  "score": (0~100 정수),\n  "source": (0~100),\n  "fact": (0~100),\n  "bias": (0~100, 높을수록 편향 없음),\n  "logic": (0~100),\n  "verdict": "real" | "fake" | "unclear",\n  "summary": "2~3문장 판별 근거 (한국어)"\n}`;
-
-  let data = { score:50, source:50, fact:50, bias:50, logic:50, verdict:'unclear', summary:'분석 결과를 가져오지 못했습니다.' };
+  const now = new Date();
+  const today = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
+  let data = { score:50, source:50, fact:50, bias:50, logic:50, verdict:'unclear', summary:'분석 결과를 가져오지 못했습니다.', details: null };
   try {
-    const now = new Date();
-    const today = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
     const res = await fetch("/api/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -284,41 +278,73 @@ async function showResult(text){
     data = await res.json();
   } catch(e){ console.error(e); }
 
-  currentResult = { text, data, time: new Date() };
   renderResult(data);
-  addToHistory(currentResult);
+  addToHistory({ text, data, time: new Date() });
   document.getElementById('checkBtn').disabled = false;
 }
 
-function renderResult(data){
-  const vEl=document.getElementById('resultVerdict');
-  const lEl=document.getElementById('resultLabel');
+function renderResult(data, targetIds){
+  const ids = targetIds || {
+    verdict:'resultVerdict', label:'resultLabel',
+    score:'scoreNum', gauge:'gaugeFill',
+    bd:['bd0','bd1','bd2','bd3'], bv:['bv0','bv1','bv2','bv3'],
+    summary:'summaryBox', detail:'detailWrap'
+  };
+
+  const vEl=document.getElementById(ids.verdict);
+  const lEl=document.getElementById(ids.label);
   if(data.verdict==='real'){vEl.textContent='✅ 신뢰할 수 있는 정보';vEl.className='result-verdict verdict-real';lEl.textContent='이 내용은 신뢰도가 높은 것으로 판단됩니다.';}
   else if(data.verdict==='fake'){vEl.textContent='🚨 가짜뉴스 가능성 높음';vEl.className='result-verdict verdict-fake';lEl.textContent='이 내용은 허위 또는 과장된 정보일 가능성이 높습니다.';}
   else{vEl.textContent='⚠️ 판별 불확실';vEl.className='result-verdict verdict-unclear';lEl.textContent='정보가 부족하거나 일부만 사실일 수 있습니다.';}
 
-  const s=data.score;
+  const s=data.score||50;
   const gColor=s>=70?'#4caf50':s>=40?'#f0a500':'#e63946';
-  const fill=document.getElementById('gaugeFill');
+  const fill=document.getElementById(ids.gauge);
   fill.style.background=gColor;
-  document.getElementById('resultWrap').classList.add('show');
 
-  let cur=0;
-  const timer=setInterval(()=>{
-    cur=Math.min(cur+Math.ceil(s/40),s);
-    document.getElementById('scoreNum').textContent=cur;
-    fill.style.width=cur+'%';
-    if(cur>=s) clearInterval(timer);
-  },25);
+  if(!targetIds){
+    document.getElementById('resultWrap').classList.add('show');
+    let cur=0;
+    const timer=setInterval(()=>{
+      cur=Math.min(cur+Math.ceil(s/40),s);
+      document.getElementById(ids.score).textContent=cur;
+      fill.style.width=cur+'%';
+      if(cur>=s) clearInterval(timer);
+    },25);
+  } else {
+    document.getElementById(ids.score).textContent=s;
+    fill.style.width=s+'%';
+  }
 
   const bColors=['#4a9eff','#a78bfa','#f0a500','#4caf50'];
   [data.source,data.fact,data.bias,data.logic].forEach((v,i)=>{
+    const delay = targetIds ? 0 : 300+i*120;
     setTimeout(()=>{
-      document.getElementById('bd'+i).style.cssText=`width:${v}%;background:${bColors[i]}`;
-      document.getElementById('bv'+i).textContent=v+'%';
-    },300+i*120);
+      document.getElementById(ids.bd[i]).style.cssText=`width:${v||50}%;background:${bColors[i]}`;
+      document.getElementById(ids.bv[i]).textContent=(v||50)+'%';
+    }, delay);
   });
-  document.getElementById('summaryBox').textContent=data.summary;
+
+  document.getElementById(ids.summary).textContent = data.summary || '';
+
+  const detailEl = document.getElementById(ids.detail);
+  detailEl.innerHTML = '';
+  if(data.details){
+    const items = [
+      {icon:'🌐',label:'출처 분석',key:'source_analysis',color:'#4a9eff'},
+      {icon:'📋',label:'팩트체크',key:'fact_analysis',color:'#a78bfa'},
+      {icon:'🧠',label:'언어 편향성',key:'bias_analysis',color:'#f0a500'},
+      {icon:'⚖️',label:'논리 일관성',key:'logic_analysis',color:'#4caf50'},
+      {icon:'🔍',label:'최종 판단 근거',key:'conclusion',color:'#e63946'},
+    ];
+    items.forEach(({icon,label,key,color})=>{
+      if(!data.details[key]) return;
+      const div=document.createElement('div');
+      div.className='detail-item';
+      div.innerHTML=`<div class="detail-label" style="color:${color}">${icon} ${label}</div><div class="detail-text">${data.details[key]}</div>`;
+      detailEl.appendChild(div);
+    });
+  }
 }
 
 function addToHistory(item){
@@ -326,73 +352,49 @@ function addToHistory(item){
   document.getElementById('historyEmpty').style.display='none';
   document.getElementById('histCount').textContent=history.length+'건';
   const list=document.getElementById('historyList');
-
-  const verdictMap={real:{badge:'badge-real',label:'신뢰',score_color:'#4caf50'},fake:{badge:'badge-fake',label:'가짜',score_color:'#e63946'},unclear:{badge:'badge-unclear',label:'불확실',score_color:'#f0a500'}};
-  const v=verdictMap[item.data.verdict]||verdictMap.unclear;
+  const v={real:{badge:'badge-real',label:'신뢰',color:'#4caf50'},fake:{badge:'badge-fake',label:'가짜',color:'#e63946'},unclear:{badge:'badge-unclear',label:'불확실',color:'#f0a500'}};
+  const vt=v[item.data.verdict]||v.unclear;
   const timeStr=item.time.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
   const shortText=item.text.length>60?item.text.slice(0,60)+'…':item.text;
-
   const div=document.createElement('div');
   div.className='hist-item';
   div.innerHTML=`
     <div class="hist-text">${shortText}</div>
     <div class="hist-meta">
-      <span class="hist-score" style="color:${v.score_color}">${item.data.score}%</span>
-      <span class="hist-badge ${v.badge}">${v.label}</span>
+      <span class="hist-score" style="color:${vt.color}">${item.data.score||50}%</span>
+      <span class="hist-badge ${vt.badge}">${vt.label}</span>
       <span class="hist-time">${timeStr}</span>
-      <button class="hist-del" title="삭제" onclick="deleteHist(event, this)">✕</button>
+      <button class="hist-del" title="삭제" onclick="deleteHist(event,this)">✕</button>
     </div>`;
   list.insertBefore(div, list.firstChild);
-
-  // 모든 항목에 현재 history 인덱스를 직접 저장
-  list.querySelectorAll('.hist-item').forEach((el, i) => {
-    el.onclick = () => openModal(i);
-  });
+  list.querySelectorAll('.hist-item').forEach((el,i)=>{ el.onclick=()=>openModal(i); });
 }
 
 function deleteHist(e, btn){
   e.stopPropagation();
-  const list = document.getElementById('historyList');
-  const item = btn.closest('.hist-item');
-  const idx = Array.from(list.children).indexOf(item);
-  history.splice(idx, 1);
+  const list=document.getElementById('historyList');
+  const item=btn.closest('.hist-item');
+  const idx=Array.from(list.children).indexOf(item);
+  history.splice(idx,1);
   item.remove();
-  document.getElementById('histCount').textContent = history.length + '건';
-  if(history.length === 0) document.getElementById('historyEmpty').style.display='';
-  // 클릭 이벤트 재연결
-  list.querySelectorAll('.hist-item').forEach((el, i) => { el.onclick = () => openModal(i); });
+  document.getElementById('histCount').textContent=history.length+'건';
+  if(history.length===0) document.getElementById('historyEmpty').style.display='';
+  list.querySelectorAll('.hist-item').forEach((el,i)=>{ el.onclick=()=>openModal(i); });
 }
 
 function openModal(idx){
   const item=history[idx];
   if(!item) return;
-  const data=item.data;
   document.getElementById('modalText').textContent=item.text;
-
-  const vEl=document.getElementById('modalVerdict');
-  const lEl=document.getElementById('modalLabel');
-  if(data.verdict==='real'){vEl.textContent='✅ 신뢰할 수 있는 정보';vEl.className='result-verdict verdict-real';lEl.textContent='신뢰도가 높은 정보입니다.';}
-  else if(data.verdict==='fake'){vEl.textContent='🚨 가짜뉴스 가능성 높음';vEl.className='result-verdict verdict-fake';lEl.textContent='허위 또는 과장된 정보일 가능성이 높습니다.';}
-  else{vEl.textContent='⚠️ 판별 불확실';vEl.className='result-verdict verdict-unclear';lEl.textContent='추가 확인을 권장합니다.';}
-
-  const s=data.score;
-  const gColor=s>=70?'#4caf50':s>=40?'#f0a500':'#e63946';
-  document.getElementById('modalScore').textContent=s;
-  const mg=document.getElementById('modalGauge');
-  mg.style.background=gColor; mg.style.width=s+'%';
-
-  const bColors=['#4a9eff','#a78bfa','#f0a500','#4caf50'];
-  [data.source,data.fact,data.bias,data.logic].forEach((v,i)=>{
-    document.getElementById('mbd'+i).style.cssText=`width:${v}%;background:${bColors[i]}`;
-    document.getElementById('mbv'+i).textContent=v+'%';
+  renderResult(item.data, {
+    verdict:'modalVerdict', label:'modalLabel',
+    score:'modalScore', gauge:'modalGauge',
+    bd:['mbd0','mbd1','mbd2','mbd3'], bv:['mbv0','mbv1','mbv2','mbv3'],
+    summary:'modalSummary', detail:'modalDetailWrap'
   });
-  document.getElementById('modalSummary').textContent=data.summary;
-
-  // highlight active
   document.querySelectorAll('.hist-item').forEach(el=>el.classList.remove('active'));
-  const list=document.getElementById('historyList');
-  if(list.children[idx]) list.children[idx].classList.add('active');
-
+  const els=document.querySelectorAll('.hist-item');
+  if(els[idx]) els[idx].classList.add('active');
   document.getElementById('modalBackdrop').classList.add('show');
 }
 
