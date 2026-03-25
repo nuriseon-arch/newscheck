@@ -5,27 +5,19 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  let body = '';
+  let text = '';
   try {
-    // body 파싱 처리
-    if (typeof req.body === 'string') {
-      body = JSON.parse(req.body);
-    } else {
-      body = req.body;
-    }
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    text = body?.text || '';
   } catch(e) {
-    return res.status(400).json({ error: 'Invalid JSON body' });
+    return res.status(400).json({ error: 'Invalid request body' });
   }
-
-  const text = body?.text;
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
   const prompt = `다음 뉴스 또는 정보의 신뢰도를 분석해주세요.
-
 입력: "${text}"
-
-반드시 아래 JSON 형식만 출력하세요. 주석, 설명, 마크다운 없이 순수 JSON만 출력하세요.
-{"score":숫자,"source":숫자,"fact":숫자,"bias":숫자,"logic":숫자,"verdict":"real또는fake또는unclear","summary":"한국어설명"}`;
+순수 JSON만 출력하세요. 마크다운, 설명 없이:
+{"score":숫자,"source":숫자,"fact":숫자,"bias":숫자,"logic":숫자,"verdict":"real또는fake또는unclear","summary":"한국어2~3문장"}`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -36,26 +28,24 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
     const data = await response.json();
-    console.log('API response:', JSON.stringify(data));
+    console.log('Anthropic response:', JSON.stringify(data));
 
-    if (!data.content || !data.content[0]) {
-      return res.status(500).json({ error: 'Empty API response', detail: data });
+    if (data.type === 'error') {
+      return res.status(500).json({ error: data.error?.message || 'API error' });
     }
 
     const raw = data.content[0].text.replace(/```json|```/g, '').trim();
-    console.log('Raw text:', raw);
-
     const result = JSON.parse(raw);
     return res.status(200).json(result);
-  } catch (e) {
-    console.error('Error:', e.message);
+  } catch(e) {
+    console.error('Handler error:', e.message);
     return res.status(500).json({ error: e.message });
   }
 }
