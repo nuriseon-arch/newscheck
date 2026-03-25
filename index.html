@@ -69,6 +69,10 @@
   .bd-fill{height:100%;border-radius:6px;transition:width 1.4s ease;}
   .bd-val{font-size:.8rem;font-weight:700;min-width:34px;text-align:right;}
   .summary-box{margin-top:16px;background:var(--bg3);border-radius:12px;padding:14px 18px;text-align:left;font-size:.86rem;color:#bbb;line-height:1.7;border-left:3px solid var(--red);}
+  .detail-wrap{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+  .detail-item{background:var(--bg3);border-radius:12px;padding:14px 18px;text-align:left;border:1px solid var(--border);}
+  .detail-label{font-size:.75rem;font-weight:700;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .detail-text{font-size:.84rem;color:#bbb;line-height:1.75;}
   .btn-reset{margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--gray);padding:9px 24px;border-radius:50px;cursor:pointer;font-family:inherit;font-size:.82rem;transition:.2s;}
   .btn-reset:hover{border-color:#fff;color:#fff;}
 
@@ -181,6 +185,7 @@
           <div class="bd-row"><div class="bd-label">논리 일관성</div><div class="bd-bar"><div class="bd-fill" id="bd3" style="width:0%"></div></div><div class="bd-val" id="bv3">-</div></div>
         </div>
         <div class="summary-box" id="summaryBox"></div>
+        <div class="detail-wrap" id="detailWrap"></div>
         <button class="btn-reset" onclick="reset()">다시 판별하기</button>
       </div>
     </div>
