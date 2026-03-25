@@ -14,7 +14,10 @@ export default async function handler(req, res) {
   }
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const prompt = `다음 뉴스 또는 정보의 신뢰도를 분석해주세요.
+  const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+  const prompt = `오늘 날짜는 ${today}입니다. 현재 연도 기준으로 판단하세요.
+
+다음 뉴스 또는 정보의 신뢰도를 분석해주세요.
 입력: "${text}"
 순수 JSON만 출력하세요. 마크다운, 설명 없이:
 {"score":숫자,"source":숫자,"fact":숫자,"bias":숫자,"logic":숫자,"verdict":"real또는fake또는unclear","summary":"한국어2~3문장"}`;
